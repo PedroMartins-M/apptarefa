@@ -1,7 +1,60 @@
 import 'package:flutter/material.dart';
 
-class ListaTarefasPage extends StatelessWidget {
+class ListaTarefasPage extends StatefulWidget {
   const ListaTarefasPage({super.key});
+
+  @override
+  State<ListaTarefasPage> createState() => _ListaTarefasPageState();
+}
+
+class _ListaTarefasPageState extends State<ListaTarefasPage> {
+  final List<Map<String, dynamic>> tarefas = [];
+
+  // Marcar tarefa como Concluida/Pendente
+  void marcarSituacao(int index) {
+    setState(() {
+      tarefas[index]['situacao'] = !tarefas[index]['situacao'];
+    });
+  }
+
+  // Remover Tarefa
+  void removerTarefa(int index) {
+    setState(() {
+      tarefas.removeAt(index);
+    });
+  }
+
+  // Adcionar Tarefa
+  void adicionarTarefa() {
+
+    final adcionarController = TextEditingController();
+
+    showDialog(context: context, builder: (context) {
+      return AlertDialog(
+        title: Text('Nova Tarefa'),
+        content: TextField(
+          controller: adcionarController,
+          decoration: InputDecoration(hintText: "Digite sua tarefa.."),
+        ),
+        actions: [
+            TextButton(onPressed: () => Navigator.pop(context),
+            child: Text('Cancelar')
+          ),
+           TextButton(onPressed: () {
+            if(adcionarController.text.isNotEmpty){
+              setState(() {
+                tarefas.add({'titulo': adcionarController.text,
+                'situacao': false});
+              });
+              Navigator.pop(context);
+            }
+           },
+            child: Text('Adcionar')
+            ),
+        ],
+      );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -11,95 +64,57 @@ class ListaTarefasPage extends StatelessWidget {
         centerTitle: true,
       ),
 
-      body: ListView(
-        padding: EdgeInsets.all(12),
-        children: [
-          Card(
-            margin: EdgeInsets.symmetric(vertical: 6),
-            child: ListTile(
-              leading: Icon(
-                Icons.check_circle,
-                color: Colors.green,
-              ),
-              title: Text(
-                'Configurar o Ambiente de Desenvolvimento',
+      body: tarefas.isEmpty
+          ? Center(
+              child: Text(
+                'Nenhuma Tarefa Encontrada',
                 style: TextStyle(
-                  decoration: TextDecoration.lineThrough,
+                  fontSize: 20,
+                  color: (Colors.grey),
                 ),
               ),
+            )
+          : ListView.builder(
+              padding: EdgeInsets.all(12),
+              itemCount: tarefas.length,
+              itemBuilder: (context, index) {
+                final tarefa = tarefas[index];
+                final bool situacao = tarefa['situacao'];
 
-              subtitle: Text('Concluida'),
-              trailing: Icon(
-                Icons.delete_outline,
-                color: Colors.grey,
-              ),
+                return Card(
+                  margin: EdgeInsets.symmetric(vertical: 6),
+                  child: ListTile(
+                    leading: GestureDetector(
+                      onTap: () => marcarSituacao(index),
+                      child: Icon(
+                        situacao ? Icons.check_circle : Icons.circle_outlined,
+                        color: situacao ? Colors.green : Colors.grey,
+                      ),
+                    ),
+                    title: Text(
+                      tarefa['titulo'],
+                      style: TextStyle(
+                        decoration: situacao
+                            ? TextDecoration.lineThrough
+                            : TextDecoration.none,
+                      ),
+                    ),
+                    subtitle: Text(situacao ? 'Concluida' : 'Pendente'),
+                    trailing: GestureDetector(
+                      onTap: () => removerTarefa(index),
+                      child: Icon(
+                        Icons.delete_outline,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
+                );
+              },
             ),
-          ),
-
-          Card(
-            margin: EdgeInsets.symmetric(vertical: 6),
-            child: ListTile(
-              leading: Icon(
-                Icons.circle_outlined,
-                color: Colors.grey,
-              ),
-              title: Text(
-                'Criar Projeto em Flutter',
-              ),
-
-              subtitle: Text('Pendente'),
-              trailing: Icon(
-                Icons.delete_outline,
-                color: Colors.grey,
-              ),
-            ),
-          ),
-
-          Card(
-            margin: EdgeInsets.symmetric(vertical: 6),
-            child: ListTile(
-              leading: Icon(
-                Icons.check_circle,
-                color: Colors.blue,
-              ),
-              title: Text(
-                ' Iniciar Desenvolvimento do App de Compras',
-                style: TextStyle(
-                  decoration: TextDecoration.lineThrough,
-                ),
-              ),
-
-              subtitle: Text('Concluida com sucesso'),
-              trailing: Icon(
-                Icons.delete_outline,
-                color: Colors.grey,
-              ),
-            ),
-          ),
-
-          Card(
-            margin: EdgeInsets.symmetric(vertical: 6),
-            child: ListTile(
-              leading: Icon(
-                Icons.circle_outlined,
-                color: const Color.fromARGB(255, 206, 15, 63),
-              ),
-              title: Text(
-                'FInalizar App de Compras',
-              ),
-
-              subtitle: Text('Tarefa Futura'),
-              trailing: Icon(
-                Icons.delete_outline,
-                color: Colors.grey,
-              ),
-            ),
-          ),
-        ],
+      floatingActionButton: FloatingActionButton(
+        onPressed: adicionarTarefa,
+        child: Icon(Icons.add),
       ),
-      floatingActionButton: FloatingActionButton(onPressed: () {},
-      child: Icon(Icons.add),
-       ),
     );
   }
 }
