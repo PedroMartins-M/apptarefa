@@ -58,12 +58,25 @@ class _ListaTarefasPageState extends State<ListaTarefasPage> {
 
   @override
   Widget build(BuildContext context) {
+
+  final List<Map<String, dynamic>> tarefas = [
+
+    {'titulo' : 'Configuração do Ambiente', 'situacao' : true},
+    {'titulo' : 'Fazer compras', 'situacao' : false},
+    {'titulo' : 'Estudar inglês', 'situacao' : false},
+    {'titulo' : 'Fazer compras', 'situacao' : true},
+    {'titulo' : 'Pagar a fatura', 'situacao' : true},
+    {'titulo' : 'Sair as 22h10', 'situacao' : false},
+  ];
+
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Minhas Tarefas"),
         centerTitle: true,
       ),
 
+<<<<<<< HEAD
       body: tarefas.isEmpty
           ? Center(
               child: Text(
@@ -71,6 +84,27 @@ class _ListaTarefasPageState extends State<ListaTarefasPage> {
                 style: TextStyle(
                   fontSize: 20,
                   color: (Colors.grey),
+=======
+      body: ListView.builder(
+        padding: EdgeInsets.all(12),
+        itemCount: tarefas.length,
+        itemBuilder: (context, index) {
+
+          final tarefa = tarefas[index];
+          final bool situacao = tarefa['situacao'];
+
+          return Card(
+            margin: EdgeInsets.symmetric(vertical: 6),
+            child: ListTile(
+              leading: Icon(
+                situacao ? Icons.check_circle : Icons.circle_outlined,
+                color: situacao ? Colors.green : Colors.grey,
+              ),
+              title: Text(
+                tarefa['titulo'],
+                style: TextStyle(
+                  decoration: situacao ? TextDecoration.lineThrough : TextDecoration.none,
+>>>>>>> e119d157c09eec9b1343eb6711d71eb45df56ad8
                 ),
               ),
             )
@@ -81,6 +115,7 @@ class _ListaTarefasPageState extends State<ListaTarefasPage> {
                 final tarefa = tarefas[index];
                 final bool situacao = tarefa['situacao'];
 
+<<<<<<< HEAD
                 return Card(
                   margin: EdgeInsets.symmetric(vertical: 6),
                   child: ListTile(
@@ -114,6 +149,16 @@ class _ListaTarefasPageState extends State<ListaTarefasPage> {
       floatingActionButton: FloatingActionButton(
         onPressed: adicionarTarefa,
         child: Icon(Icons.add),
+=======
+              subtitle:  Text(situacao ?'Concluida' : 'Pendente'),
+              trailing: Icon(
+                Icons.delete_outline,
+                color: Colors.grey,
+              ),
+            ),
+          );
+        }
+>>>>>>> e119d157c09eec9b1343eb6711d71eb45df56ad8
       ),
     );
   }
