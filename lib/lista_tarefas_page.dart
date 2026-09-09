@@ -1,28 +1,23 @@
 import 'package:apptarefa/database_helper.dart';
+import 'package:apptarefa/sobre_page.dart';
 import 'package:flutter/material.dart';
- 
-class ListaTarefasPage extends StatefulWidget {
 
+class ListaTarefasPage extends StatefulWidget {
   const ListaTarefasPage({super.key});
 
-
-
   @override
-
   State<ListaTarefasPage> createState() => _ListaTarefasPageState();
-
 }
 
 class _ListaTarefasPageState extends State<ListaTarefasPage> {
-
   List<Map<String, dynamic>> tarefas = [];
- 
+
   @override
   void initState() {
     super.initState();
     carregarTarefas();
   }
- 
+
   void carregarTarefas() async {
     //Carregar as tarefas do banco de dados
     final dados = await DatabaseHelper.buscarTarefas();
@@ -30,35 +25,35 @@ class _ListaTarefasPageState extends State<ListaTarefasPage> {
       tarefas = dados;
     });
   }
- 
+
   // Marcar tarefa como Concluida/Pendente
   void marcarSituacao(int index) async {
     final tarefa = tarefas[index];
- 
+
     // Descomente a linha e use o operador ternário para alternar o valor
     final novaSituacao = tarefa['situacao'] == 1 ? 0 : 1;
- 
+
     await DatabaseHelper.atualizarSituacao(
       tarefa['id'],
       novaSituacao, // Passa a nova situação invertida
     );
- 
+
     carregarTarefas(); // Atualiza a lista de tarefas
   }
- 
+
   //Remover Tarefa
   void removerTarefa(int index) async {
     final tarefa = tarefas[index];
- 
+
     await DatabaseHelper.removerTarefa(tarefa['id']);
- 
+
     carregarTarefas(); // Atualiza a lista de tarefas
   }
- 
+
   //Adicionar Tarefa
   void adicionarTarefa() {
     final adicionarControle = TextEditingController();
- 
+
     showDialog(
       context: context,
       builder: (context) {
@@ -77,9 +72,9 @@ class _ListaTarefasPageState extends State<ListaTarefasPage> {
               onPressed: () async {
                 if (adicionarControle.text.isNotEmpty) {
                   await DatabaseHelper.inserirTarefa(adicionarControle.text);
- 
+
                   carregarTarefas(); // Atualiza a lista de tarefas
- 
+
                   // Fecha o diálogo apenas se o contexto continuar ativo após o await
                   if (context.mounted) {
                     Navigator.pop(context);
@@ -93,13 +88,42 @@ class _ListaTarefasPageState extends State<ListaTarefasPage> {
       },
     );
   }
- 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text("Minhas Tarefas"),
         centerTitle: true,
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              decoration: BoxDecoration(color: Colors.indigo),
+              child: Text(
+                "Minhas Tarefas",
+                style: TextStyle(color: Colors.white, fontSize: 22),
+              ),
+            ),
+            ListTile(
+              leading: Icon(Icons.list),
+              title: Text("Todas as minhas tarefas"),
+              onTap: () {},
+            ),
+
+            ListTile(
+              leading: Icon(Icons.info_outline),
+              title: Text("Sobre o Aplicativo"),
+              onTap: () {
+
+                Navigator.pop(context);
+                Navigator.push(context, MaterialPageRoute(builder: (_) => SobrePage() ));
+              },
+            )
+          ],
+        ),
       ),
       body: tarefas.isEmpty
           ? Center(
@@ -114,7 +138,7 @@ class _ListaTarefasPageState extends State<ListaTarefasPage> {
               itemBuilder: (context, index) {
                 final tarefa = tarefas[index];
                 final bool situacao = tarefa['situacao'] == 1;
- 
+
                 return Card(
                   margin: EdgeInsets.symmetric(vertical: 6),
                   child: ListTile(
@@ -147,7 +171,7 @@ class _ListaTarefasPageState extends State<ListaTarefasPage> {
                 );
               },
             ),
- 
+
       floatingActionButton: FloatingActionButton(
         //onPressed: () => adicionarTarefa(),
         onPressed: adicionarTarefa,
@@ -158,4 +182,3 @@ class _ListaTarefasPageState extends State<ListaTarefasPage> {
     );
   }
 }
- 
