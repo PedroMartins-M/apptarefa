@@ -31,9 +31,25 @@ class DatabaseHelper {
   }
  
   //READ: Buscar/Listar todas as tarefas salvas no banco de dados
-  static Future<List<Map<String, dynamic>>> buscarTarefas() async {
+static Future<List<Map<String, dynamic>>> buscarTarefas({
+    String? filtro   // quando coloca {} deixa opcional o parametro
+    }) async{
     final db = await DatabaseHelper.database;
-    return db.query('tarefas'); //SELECT * FROM tarefas
+ 
+    if(filtro == 'pendentes'){
+      // SELECT * FROM tarefas WHERE situacao = 0
+      return db.query(
+        'tarefas',
+        where: 'situacao = 0',
+      );
+    } else if(filtro == 'concluidas'){
+      // SELECT * FROM tarefas WHERE situacao = 1
+      return db.query(
+        'tarefas',
+        where: 'situacao = 1',
+      );
+    }
+    return db.query('tarefas');
   }
  
   //CREATE: Inserir tarefa no banco de dados
@@ -44,6 +60,7 @@ class DatabaseHelper {
       'situacao': 0, //0 = False, 1 = Verdadeiro (SQLite não tem tipo Boolean)
     });
   }
+  
  
   //UPDATE: Alterar o campo marcado
   static Future<void> atualizarSituacao(int id, int situacao) async {

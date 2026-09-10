@@ -12,6 +12,8 @@ class ListaTarefasPage extends StatefulWidget {
 class _ListaTarefasPageState extends State<ListaTarefasPage> {
   List<Map<String, dynamic>> tarefas = [];
 
+  String? filtroAtual;
+
   @override
   void initState() {
     super.initState();
@@ -20,7 +22,7 @@ class _ListaTarefasPageState extends State<ListaTarefasPage> {
 
   void carregarTarefas() async {
     //Carregar as tarefas do banco de dados
-    final dados = await DatabaseHelper.buscarTarefas();
+    final dados = await DatabaseHelper.buscarTarefas(filtro: filtroAtual);
     setState(() {
       tarefas = dados;
     });
@@ -40,6 +42,13 @@ class _ListaTarefasPageState extends State<ListaTarefasPage> {
 
     carregarTarefas(); // Atualiza a lista de tarefas
   }
+
+  void aplicarFiltro(String? novoFiltro){
+    filtroAtual = novoFiltro;
+    Navigator.pop(context);
+    carregarTarefas();
+  }
+ 
 
   //Remover Tarefa
   void removerTarefa(int index) async {
@@ -89,11 +98,11 @@ class _ListaTarefasPageState extends State<ListaTarefasPage> {
     );
   }
 
-  @override
+   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Minhas Tarefas"),
+        title: Text("Minhas tarefas"),
         centerTitle: true,
       ),
       drawer: Drawer(
@@ -109,19 +118,40 @@ class _ListaTarefasPageState extends State<ListaTarefasPage> {
             ),
             ListTile(
               leading: Icon(Icons.list),
-              title: Text("Todas as minhas tarefas"),
-              onTap: () {},
+              title: Text('Todas as Tarefas'),
+              selected: filtroAtual == null,
+              selectedColor: Colors.blue[700],
+              onTap: () => aplicarFiltro(null),
             ),
-
+            ListTile(
+              leading: Icon(Icons.pending_actions),
+              title: Text('Pendentes'),
+              selected: filtroAtual == 'pendentes',
+              selectedColor: Colors.blue[700],
+              onTap: () => aplicarFiltro('pendentes'),
+            ),
+            ListTile(
+              leading: Icon(Icons.check_circle_outline),
+              title: Text('Concluidas'),
+              selected: filtroAtual == 'concluidos',
+              selectedColor: Colors.blue[700],
+              onTap: () => aplicarFiltro('concluidas'),
+            ),
             ListTile(
               leading: Icon(Icons.info_outline),
-              title: Text("Sobre o Aplicativo"),
+              title: Text('Sobre o Aplicativo'),
               onTap: () {
-
+ 
                 Navigator.pop(context);
-                Navigator.push(context, MaterialPageRoute(builder: (_) => SobrePage() ));
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => SobrePage()
+                  ),
+                );
+ 
               },
-            )
+            ),
           ],
         ),
       ),
